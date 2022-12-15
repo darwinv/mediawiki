@@ -1,0 +1,53 @@
+### Docker Compose Example for Kinda Lame
+### Created October 2020
+### Darwin version for wiki-ebr
+version: '3'
+services:
+  web:
+    image: mediawiki:lts
+    depends_on:
+       - database
+    networks:
+      wikiebr:
+        aliases:
+           - web
+    environment:
+      - MEDIAWIKI_DB_HOST=db
+    ports:
+### We are running the server behind NGINX which we
+### recommend all users doing. And due to the need to
+### login to the site we recommend running Certbot
+### on your domain and putting the proxy behind
+### an SSL certificate to keep your passwords safe!
+###
+      - 8000:80
+    restart: unless-stopped
+    volumes:
+     - ./images:/var/www/html/images
+     - ./LocalSettings.php:/var/www/html/LocalSettings.php
+     - ./mysql_pw.php:/var/www/external_includes/mysql_pw.php
+#      - ./www:/var/www
+#      - ./uploads.ini:/etc/php5/fpm/conf.d/uploads.ini:ro
+#      - ./php:/usr/local/etc/php
+  database:
+    image: mariadb:10.7.3
+    environment:
+      MYSQL_DATABASE: ${SQL_DATABASE}
+      MYSQL_USER: ${SQL_USER}
+      MYSQL_ROOT_PASSWORD: ${SQL_ROOT_PASSWORD}
+
+#
+# Generate a secure password and place it in the area below
+#
+      MYSQL_PASSWORD: ${SQL_PASSWORD}
+      # MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+    ports:
+        - 3306:3306
+    volumes:
+      - ./database:/var/lib/mysql
+    networks:
+      wikiebr:
+        aliases:
+          - database
+networks:
+  wikiebr:

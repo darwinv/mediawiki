@@ -1,0 +1,12 @@
+
+# Folders to ignore
+database/
+images/
+
+# Environment Variables & security files
+.env
+mysql_pw.php
+
+
+
+# End of https://www.toptal.com/developers/gitignore/api/phpunit
